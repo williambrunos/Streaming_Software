@@ -32,16 +32,12 @@ class StreamingService:
         self._server_runnig = True
         
         print(f'Server listening on {self._host}:{self._port}')
-        print(f'Press CTRL+C to quit')
-        
-        
         
         while True:
-            print('New iteration')
             client_socket, address = server_socket.accept()
             print(f'Client connected from {address}')
                             
-            client_handler = ClientHandler(client_socket, server_socket, self._streams)
+            client_handler = ClientHandler(client_socket, self._streams)
             client_handler.start()
             
             
@@ -73,18 +69,55 @@ class ClientHandler(threading.Thread):
         """
         
         while True:
-            print('New iteration client handler')
-            data = self._client_socket.recv(1024)
+            data = self.receive_message()
+            print(f'Received {data}')
             if not data:
                 break
-                
-            stream_id, stream_data = data.decode().split(':')
+            
+            data = data.decode()
+            # 1013:stream1:data1
+            stream_id, stream_data = data[4:].split(':', 1)
             if stream_id not in self._streams:
                 self._streams[stream_id] = []
             self._streams[stream_id].append(stream_data)
             
         self._client_socket.close()
+        
+    def receive_message(self):
+        """
+        Method responsible for receiving the message.
+        
+        Keyword arguments:
+        argument N/A 
+        Return: data read from the socket
+        """
+        
+        message_length = self._client_socket.recv(4)
+        if not message_length:
+            return b''
+        
+        message_length = int.from_bytes(message_length, byteorder='big')
+        return self.receive_data(message_length)
     
+    def receive_data(self, length):
+        """
+        Receive data from the socket and returns the data
+        read after a certain amount of bytes specified
+        as prefix of the message.
+        
+        Keyword arguments:
+        argument length -- length of the message in bytes
+        Return: data -- data read from the socket
+        """
+        
+        data = b''
+        while len(data) < length:
+            packet = self._client_socket.recv(length - len(data))
+            if not packet:
+                return b''
+            data += packet
+        
+        return data
     
 def main():
     SERVER_RUNNING_PORT = 8000
