@@ -69,7 +69,7 @@ class ClientHandler(threading.Thread):
         """
         
         while True:
-            data = self.receive_message()
+            data = self._receive_message()
             print(f'Received {data}')
             if not data:
                 break
@@ -83,7 +83,7 @@ class ClientHandler(threading.Thread):
             
         self._client_socket.close()
         
-    def receive_message(self):
+    def _receive_message(self):
         """
         Method responsible for receiving the message.
         
@@ -97,9 +97,9 @@ class ClientHandler(threading.Thread):
             return b''
         
         message_length = int.from_bytes(message_length, byteorder='big')
-        return self.receive_data(message_length)
+        return self._receive_data(message_length)
     
-    def receive_data(self, length):
+    def _receive_data(self, length):
         """
         Receive data from the socket and returns the data
         read after a certain amount of bytes specified
