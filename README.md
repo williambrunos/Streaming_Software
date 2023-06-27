@@ -16,6 +16,25 @@ After that, initiate the python virtual environment:
 .\venv\Scripts\activate
 ```
 
+## How to download dependencies
+
+All the dependencies are installed in the **requirements.txt** file.
+
+1. Start python venv
+
+````
+python -m venv ./venv
+.\venv\Scripts\activate
+````
+
+2. Install the requirements
+
+At the root folder of the repository, run the following command:
+
+````Bash
+pip install -r requirements.txt
+````
+
 ## How to contribute
 
 ```Bash
